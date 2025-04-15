@@ -2,15 +2,6 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
-import { v4 as uuidv4 } from 'uuid'
-
-interface TestResults {
-  eneatipo_resultado: number | null;
-  ala_resultado: number | null;
-  confianza: number;
-  puntajes: { [key: number]: number };
-  duracion_test: number;
-}
 
 type Pregunta = {
   id: number
