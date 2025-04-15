@@ -34,31 +34,58 @@ export default function ResultadoPage() {
   const [eneatipo, setEneatipo] = useState<number | null>(null)
   const [ala, setAla] = useState<number | null>(null)
   const [puntajes, setPuntajes] = useState<{ [key: string]: number }>({})
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchResultado = async () => {
-      let userId = localStorage.getItem('user_id')
-      if (!userId) return
+      try {
+        // Verificar conexión Supabase
+        const { data: connectionTest, error: connectionError } = await supabase.from('results_test').select('count').limit(1)
+        
+        if (connectionError) {
+          console.error('❌ Error de conexión con Supabase:', connectionError)
+          setError('Error de conexión con la base de datos')
+          return
+        }
 
-      if (userId.includes(':')) {
-        userId = userId.split(':')[0]
-      }
+        let userId = localStorage.getItem('user_id')
+        if (!userId) {
+          setError('No se encontró identificación de usuario')
+          return
+        }
 
-      const { data, error } = await supabase
-        .from('results_test')
-        .select('eneatipo_resultado, ala_resultado, puntajes')
-        .eq('user_id', userId)
-        .maybeSingle()
+        if (userId.includes(':')) {
+          userId = userId.split(':')[0]
+        }
 
-      if (error) {
-        console.error('❌ Error al cargar resultado:', error)
-        return
-      }
+        console.log('🔍 Buscando resultados para userId:', userId)
 
-      if (data) {
+        const { data, error } = await supabase
+          .from('results_test')
+          .select('eneatipo_resultado, ala_resultado, puntajes')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single()
+
+        if (error) {
+          console.error('❌ Error completo:', JSON.stringify(error, null, 2))
+          setError(`Error al cargar datos: ${error.message}`)
+          return
+        }
+
+        if (!data) {
+          setError('No se encontraron resultados para este usuario')
+          return
+        }
+
         setEneatipo(data.eneatipo_resultado)
         setAla(data.ala_resultado)
         setPuntajes(data.puntajes || {})
+        setError(null)
+      } catch (err) {
+        console.error('❌ Error inesperado:', err)
+        setError('Ocurrió un error inesperado')
       }
     }
 
@@ -76,7 +103,17 @@ export default function ResultadoPage() {
     <main className="max-w-3xl mx-auto p-6 space-y-6">
       <h1 className="text-3xl font-bold text-center">🎯 Tu Perfil EnneaMind</h1>
 
-      {eneatipo && ala ? (
+      {error ? (
+        <div className="bg-red-50 border border-red-200 p-4 rounded-xl text-center">
+          <p className="text-red-600">{error}</p>
+          <button
+            className="mt-4 bg-red-100 text-red-700 px-4 py-2 rounded hover:bg-red-200"
+            onClick={() => window.location.href = '/'}
+          >
+            Volver al inicio
+          </button>
+        </div>
+      ) : eneatipo && ala ? (
         <div className="bg-white p-6 rounded-xl shadow space-y-6">
           <div className="text-center">
             <h2 className="text-xl font-semibold text-gray-700">Eneatipo dominante:</h2>
