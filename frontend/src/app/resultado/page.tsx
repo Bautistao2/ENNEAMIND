@@ -40,7 +40,7 @@ export default function ResultadoPage() {
     const fetchResultado = async () => {
       try {
         // Verificar conexión Supabase
-        const { data: connectionTest, error: connectionError } = await supabase.from('results_test').select('count').limit(1)
+        const { error: connectionError } = await supabase.from('results_test').select('count').limit(1)
         
         if (connectionError) {
           console.error('❌ Error de conexión con Supabase:', connectionError)
