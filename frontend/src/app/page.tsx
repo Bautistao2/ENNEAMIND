@@ -1,7 +1,16 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
 import { v4 as uuidv4 } from 'uuid'
+
+interface TestResults {
+  eneatipo_resultado: number | null;
+  ala_resultado: number | null;
+  confianza: number;
+  puntajes: { [key: number]: number };
+  duracion_test: number;
+}
 
 type Pregunta = {
   id: number
@@ -18,6 +27,8 @@ export default function Home() {
   const [respuestas, setRespuestas] = useState<{ [codigo: string]: number }>({})
   const [pagina, setPagina] = useState(0)
   const [userId, setUserId] = useState<string>('')
+  const [startTime] = useState(Date.now())
+  const router = useRouter()
 
   const preguntasPorPagina = 10
   const totalPaginas = Math.ceil(preguntas.length / preguntasPorPagina)
@@ -29,13 +40,31 @@ export default function Home() {
 
     if (storedRespuestas) setRespuestas(JSON.parse(storedRespuestas))
     if (storedPagina) setPagina(Number(storedPagina))
-    if (storedUserId) setUserId(storedUserId)
-    else {
-      const newUserId = uuidv4()
-      setUserId(newUserId)
-      localStorage.setItem('user_id', newUserId)
+
+    if (!storedUserId) {
+      console.log('No se encontró user_id, redirigiendo a datos personales...')
+      router.push('/datos-personales')
+      return
     }
-  }, [])
+    setUserId(storedUserId)
+
+    // Verificar si el usuario existe en la base de datos
+    const checkUser = async () => {
+      const { data, error } = await supabase
+        .from('personal_data')
+        .select('user_id')
+        .eq('user_id', storedUserId)
+        .single()
+
+      if (error || !data) {
+        console.log('Usuario no encontrado en BD, redirigiendo...')
+        router.push('/datos-personales')
+        return
+      }
+    }
+
+    checkUser()
+  }, [router])
 
   useEffect(() => {
     localStorage.setItem('respuestas', JSON.stringify(respuestas))
@@ -91,54 +120,95 @@ export default function Home() {
   }
 
   const handleEnviar = async () => {
-    const preguntasPagina = preguntasActuales.map((p) => p.codigo)
-    const sinResponder = preguntasPagina.some((codigo) => !respuestas[codigo])
-
-    if (sinResponder) {
-      alert('Debes responder todas las preguntas antes de enviar el test.')
-      return
-    }
-
     try {
-      await supabase.from('users_test').upsert([{ id: userId }])
+      if (!userId) {
+        console.error('No se encontró user_id')
+        router.push('/datos-personales')
+        return
+      }
 
-      const respuestasArray = preguntas.map((p) => ({
-        user_id: userId,
-        pregunta_codigo: p.codigo,
-        respuesta: respuestas[p.codigo],
-      }))
-      await supabase.from('responses_test').insert(respuestasArray)
+      // 1. Verificar respuestas completas
+      const todasRespondidas = preguntas.every(p => respuestas[p.codigo])
+      if (!todasRespondidas) {
+        alert('Debes responder todas las preguntas antes de enviar el test.')
+        return
+      }
 
+      // 2. Calcular puntajes con más detalle
       const puntajes: { [key: number]: number } = {}
+      let totalRespuestas = 0
+      
       preguntas.forEach((p) => {
         const valor = respuestas[p.codigo]
         if (valor) {
           puntajes[p.eneatipo_asociado] = (puntajes[p.eneatipo_asociado] || 0) + valor
+          totalRespuestas++
         }
       })
 
+      // 3. Calcular eneatipo y ala con validación
       const ordenados = Object.entries(puntajes)
         .sort((a, b) => b[1] - a[1])
-        .map(([key]) => Number(key))
-      const eneatipo = ordenados[0]
-      const ala = ordenados[1]
+        .map(([key, value]) => ({ eneatipo: Number(key), puntaje: value }))
 
-      await supabase.from('results_test').insert([{
-        user_id: userId,
-        eneatipo_resultado: eneatipo,
-        ala_resultado: ala,
-        confianza: 1.0,
-        puntajes: puntajes,
-      }])
+      const eneatipo = ordenados[0]?.eneatipo
+      const ala = ordenados[1]?.eneatipo
 
+      // Calcular confianza basada en la diferencia de puntajes
+      const confianza = ordenados[0] && ordenados[1] 
+        ? Math.min(1, (ordenados[0].puntaje - ordenados[1].puntaje) / 10)
+        : 0
+
+      console.log('Resultados calculados:', {
+        puntajes,
+        eneatipo,
+        ala,
+        confianza,
+        totalRespuestas
+      })
+
+      // 4. Guardar primero las respuestas individuales
+      const { error: responsesError } = await supabase
+        .from('responses_test')
+        .insert(preguntas.map((p) => ({
+          user_id: userId,
+          pregunta_codigo: p.codigo,
+          respuesta: respuestas[p.codigo],
+        })))
+
+      if (responsesError) {
+        console.error('Error al guardar respuestas:', responsesError)
+        throw responsesError
+      }
+
+      // 5. Usar update en lugar de upsert
+      const { data: savedResult, error: resultsError } = await supabase
+        .from('results_test')
+        .update({
+          eneatipo_resultado: eneatipo,
+          ala_resultado: ala,
+          confianza: confianza,
+          puntajes: puntajes,
+          duracion_test: Math.floor((Date.now() - startTime) / 1000)
+        })
+        .eq('user_id', userId)
+        .select()
+
+      if (resultsError) {
+        console.error('Error al guardar resultados:', resultsError)
+        throw resultsError
+      }
+
+      console.log('Resultados guardados:', savedResult)
+
+      // 6. Limpiar y redireccionar
       localStorage.removeItem('respuestas')
       localStorage.removeItem('pagina')
-      // No eliminamos user_id para que /resultado funcione
+      router.push('/resultado')
 
-      window.location.href = '/resultado'
     } catch (error) {
-      console.error('Error al guardar datos:', error)
-      alert('Ocurrió un error al guardar tus respuestas. Intenta de nuevo.')
+      console.error('Error detallado:', error)
+      alert('Hubo un error al guardar tus respuestas. Por favor, intenta de nuevo.')
     }
   }
 
