@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/lib/supabaseClient';
 
 // Comunidades autónomas de España
@@ -99,41 +98,31 @@ const DatosPersonales = () => {
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        if (!validateForm()) {
-            return;
-        }
+        if (!validateForm()) return;
 
         try {
-            // 1. Generar nuevo user_id
-            const userId = uuidv4();
-            console.log('Nuevo user_id generado:', userId);
-
-            // 2. Preparar datos para inserción
-            const personalData = {
-                user_id: userId,
-                edad: parseInt(formData.edad),
-                sexo: formData.sexo,
-                comunidad_autonoma: formData.comunidadAutonoma,
-                provincia: formData.provincia,
-                localidad: formData.localidad,
-                nivel_educativo: [formData.nivelesEducativos]
-            };
-            console.log('Datos a insertar:', personalData);
-
-            // 3. PRIMERO insertar en personal_data
+            // 1. Insertar en personal_data (el ID se generará automáticamente)
             const { data: insertedData, error: personalDataError } = await supabase
                 .from('personal_data')
-                .insert(personalData)
-                .select(); // Añadimos .select() para verificar los datos insertados
+                .insert({
+                    edad: parseInt(formData.edad),
+                    sexo: formData.sexo,
+                    comunidad_autonoma: formData.comunidadAutonoma,
+                    provincia: formData.provincia,
+                    localidad: formData.localidad,
+                    nivel_educativo: [formData.nivelesEducativos]
+                })
+                .select();
 
             if (personalDataError) {
                 console.error('Error en personal_data:', personalDataError);
                 throw personalDataError;
             }
 
-            console.log('Datos insertados en personal_data:', insertedData);
+            const userId = insertedData[0].user_id;
+            console.log('Nuevo user_id generado:', userId);
 
-            // 4. DESPUÉS insertar en results_test
+            // 2. Insertar en results_test
             const { data: resultData, error: resultsError } = await supabase
                 .from('results_test')
                 .insert({
@@ -153,7 +142,7 @@ const DatosPersonales = () => {
 
             console.log('Datos insertados en results_test:', resultData);
 
-            // 5. Verificar que los datos se guardaron correctamente
+            // 3. Verificar que los datos se guardaron correctamente
             const { data: verificationData, error: verificationError } = await supabase
                 .from('personal_data')
                 .select('*')
@@ -167,7 +156,7 @@ const DatosPersonales = () => {
 
             console.log('Verificación de datos guardados:', verificationData);
 
-            // 6. Solo si todo está correcto, guardar en localStorage y redireccionar
+            // 4. Solo si todo está correcto, guardar en localStorage y redireccionar
             localStorage.setItem('user_id', userId);
             console.log('User ID guardado en localStorage:', userId);
             
