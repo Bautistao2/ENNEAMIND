@@ -173,19 +173,25 @@ const DatosPersonales = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-100 via-white to-purple-100">
-            <div className="max-w-2xl mx-auto p-4 md:p-8 relative min-h-screen md:min-h-0 md:my-8">
-                <h1 className="text-2xl md:text-4xl font-bold text-center mb-4 md:mb-8">
-                    <span className="inline-block bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                        📝 Datos Personales
-                    </span>
-                </h1>
-                
-                <p className="text-gray-600 text-center mb-6 text-sm md:text-base">
-                    Por favor, completa tus datos para comenzar el test
-                </p>
+        // Contenedor principal con padding ajustado
+        <div className="min-h-screen bg-gradient-to-br from-blue-100 via-white to-purple-100 p-4">
+            {/* Contenedor del formulario con sombra y fondo */}
+            <div className="max-w-2xl mx-auto bg-white/90 rounded-xl shadow-lg overflow-hidden">
+                {/* Cabecera */}
+                <div className="p-4 md:p-8">
+                    <h1 className="text-2xl md:text-4xl font-bold text-center mb-4">
+                        <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                            📝 Datos Personales
+                        </span>
+                    </h1>
+                    
+                    <p className="text-gray-600 text-center mb-6 text-sm md:text-base">
+                        Por favor, completa tus datos para comenzar el test
+                    </p>
+                </div>
 
-                <form onSubmit={handleSubmit} className="space-y-5">
+                {/* Formulario con padding y espaciado */}
+                <form onSubmit={handleSubmit} className="p-4 md:p-8 space-y-6">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Edad</label>
                         <input
@@ -294,18 +300,24 @@ const DatosPersonales = () => {
 
                     {errors.submit && <p className="text-red-500 text-center">{errors.submit}</p>}
 
-                    <div className="sticky bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-sm md:static md:p-0 md:bg-transparent md:backdrop-blur-none">
-                        <button
-                            type="submit"
-                            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 
-                                    text-white p-4 rounded-lg font-medium 
-                                    hover:shadow-lg transition-all
-                                    focus:outline-none focus:ring-2 
-                                    focus:ring-blue-500 focus:ring-offset-2"
-                        >
-                            Comenzar Test
-                        </button>
+                    {/* Contenedor del botón */}
+                    <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/95 backdrop-blur-sm shadow-lg md:relative md:p-0 md:bg-transparent md:shadow-none">
+                        <div className="max-w-2xl mx-auto">
+                            <button
+                                type="submit"
+                                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 
+                                        text-white py-4 px-6 rounded-lg font-medium 
+                                        hover:shadow-lg transition-all
+                                        focus:outline-none focus:ring-2 
+                                        focus:ring-blue-500 focus:ring-offset-2"
+                            >
+                                Comenzar Test
+                            </button>
+                        </div>
                     </div>
+
+                    {/* Espacio extra para evitar que el botón tape contenido en móvil */}
+                    <div className="h-20 md:h-0" />
                 </form>
             </div>
         </div>
