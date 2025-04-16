@@ -173,12 +173,16 @@ const DatosPersonales = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-100 via-white to-purple-100 py-12 px-4">
-            <div className="max-w-2xl mx-auto p-8 bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl">
-                <h1 className="text-4xl font-bold text-center bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-8">
-                    📝 Datos Personales
+        <div className="min-h-screen bg-gradient-to-br from-blue-100 via-white to-purple-100 p-4 md:py-12 md:px-4">
+            <div className="max-w-2xl mx-auto p-4 md:p-8 bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl">
+                {/* Ajustar el tamaño del título en móvil */}
+                <h1 className="text-2xl md:text-4xl font-bold text-center mb-4 md:mb-8">
+                    <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                        📝 Datos Personales
+                    </span>
                 </h1>
-                <p className="text-gray-600 text-center mb-8 text-lg">
+                
+                <p className="text-gray-600 text-center mb-6 md:mb-8 text-base md:text-lg">
                     Por favor, completa tus datos para comenzar el test
                 </p>
                 <form onSubmit={handleSubmit} className="space-y-5">
@@ -290,13 +294,21 @@ const DatosPersonales = () => {
 
                     {errors.submit && <p className="text-red-500 text-center">{errors.submit}</p>}
 
+                    {/* Ajustar el botón para móvil */}
                     <button
                         type="submit"
-                        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-lg font-medium
-                                 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white p-3 md:p-4 
+                                 rounded-lg font-medium text-sm md:text-base
+                                 hover:shadow-lg focus:outline-none focus:ring-2 
+                                 focus:ring-blue-500 focus:ring-offset-2
+                                 fixed bottom-4 left-4 right-4 md:static
+                                 z-10 md:z-0"
                     >
                         Comenzar Test
                     </button>
+
+                    {/* Añadir padding extra al final en móvil para el botón fijo */}
+                    <div className="h-16 md:h-0 block md:hidden"></div>
                 </form>
             </div>
         </div>
