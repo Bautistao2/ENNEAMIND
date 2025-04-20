@@ -122,15 +122,17 @@ export default function ResultadoPage() {
           </div>
 
           <div className="text-center">
-            <h2 className="text-lg font-semibold text-gray-700">Ala:</h2>
-            <p className="text-3xl font-bold text-gray-800">Ala {ala}</p>
-            <p className="text-gray-600 italic">{descripciones[ala]}</p>
+            <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-200">Ala:</h2>
+            <p className="text-3xl font-bold text-gray-800 dark:text-white">Ala {ala}</p>
+            <p className="text-gray-600 dark:text-gray-300 italic">{descripciones[ala]}</p>
           </div>
 
           {/* Gráfico Radar */}
           {radarData.length > 0 && (
-            <div className="mt-8 bg-gray-50 border rounded-xl p-4 shadow-inner">
-              <h3 className="text-center font-semibold mb-4">Visualización de tus puntajes por eneatipo</h3>
+            <div className="mt-8 bg-gray-50 dark:bg-gray-800 border rounded-xl p-4 shadow-inner">
+              <h3 className="text-center font-semibold mb-4 text-gray-800 dark:text-black">
+                Visualización de tus puntajes por eneatipo
+              </h3>
               <ResponsiveContainer width="100%" height={400}>
                 <RadarChart cx="50%" cy="50%" outerRadius="80%" data={radarData} animationDuration={800}>
                   <PolarGrid strokeDasharray="3 3" />

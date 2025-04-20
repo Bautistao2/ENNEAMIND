@@ -173,82 +173,115 @@ const DatosPersonales = () => {
     };
 
     return (
-        // Contenedor principal con padding ajustado
-        <div className="min-h-screen bg-gradient-to-br from-blue-100 via-white to-purple-100 p-4">
+        // Contenedor principal con padding ajustado - actualizado para dark mode
+        <div className="min-h-screen bg-gradient-to-br from-blue-100 via-white to-purple-100 dark:from-blue-950 dark:via-gray-900 dark:to-purple-950 p-4">
             {/* Contenedor del formulario con sombra y fondo */}
-            <div className="max-w-2xl mx-auto bg-white/90 rounded-xl shadow-lg overflow-hidden">
+            <div className="max-w-2xl mx-auto bg-white/90 dark:bg-gray-800/90 rounded-xl shadow-lg overflow-hidden">
                 {/* Cabecera */}
                 <div className="p-4 md:p-8">
                     <h1 className="text-2xl md:text-4xl font-bold text-center mb-4">
-                        <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent dark:from-blue-400 dark:to-purple-400">
                             📝 Datos Personales
                         </span>
                     </h1>
                     
-                    <p className="text-gray-600 text-center mb-6 text-sm md:text-base">
+                    <p className="text-gray-900 dark:text-black text-center mb-6 text-sm md:text-base">
                         Por favor, completa tus datos para comenzar el test
                     </p>
                 </div>
 
                 {/* Formulario con padding y espaciado */}
                 <form onSubmit={handleSubmit} className="p-4 md:p-8 space-y-6">
+                    {/* Actualizar cada label y input */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Edad</label>
+                        <label className="block text-sm font-medium text-gray-900 dark:text-black mb-2">
+                            Edad
+                        </label>
                         <input
                             type="number"
                             min="10"
                             max="90"
                             value={formData.edad}
                             onChange={(e) => setFormData({ ...formData, edad: e.target.value })}
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full p-3 border border-gray-300 dark:border-gray-600 
+                                     bg-white dark:bg-gray-700 
+                                     text-gray-900 dark:text-white
+                                     rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             placeholder="Ingresa tu edad"
                         />
-                        {errors.edad && <p className="text-red-500 text-sm mt-2">{errors.edad}</p>}
+                        {errors.edad && <p className="text-red-500 dark:text-red-400 text-sm mt-2">{errors.edad}</p>}
                     </div>
 
+                    {/* Actualizar los selects */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Sexo</label>
+                        <label className="block text-sm font-medium text-gray-900 dark:text-black mb-2">
+                            Sexo
+                        </label>
                         <select
                             value={formData.sexo}
                             onChange={(e) => setFormData({ ...formData, sexo: e.target.value })}
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full p-3 border border-gray-300 dark:border-gray-600 
+                                     bg-white dark:bg-gray-700 
+                                     text-gray-900 dark:text-gray-100
+                                     rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                                     dark:bg-gray-700 dark:text-gray-100
+                                     [&>*]:dark:bg-gray-700 [&>*]:dark:text-gray-100"
+                            style={{ colorScheme: 'light dark' }}
                         >
-                            <option value="">Seleccione...</option>
+                            <option value="" className="bg-white dark:bg-gray-700">
+                                Seleccione...
+                            </option>
                             {SEXO_OPTIONS.map(option => (
-                                <option key={option} value={option}>{option}</option>
+                                <option key={option} value={option} className="bg-white dark:bg-gray-700">
+                                    {option}
+                                </option>
                             ))}
                         </select>
-                        {errors.sexo && <p className="text-red-500 text-sm mt-2">{errors.sexo}</p>}
+                        {errors.sexo && <p className="text-red-500 dark:text-red-400 text-sm mt-2">{errors.sexo}</p>}
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Comunidad Autónoma</label>
-                        <input
-                            type="text"
-                            list="comunidades"
+                        <label className="block text-sm font-medium text-gray-900 dark:text-black mb-2">
+                            Comunidad Autónoma
+                        </label>
+                        <select
                             value={formData.comunidadAutonoma}
                             onChange={(e) => setFormData({ 
                                 ...formData, 
                                 comunidadAutonoma: e.target.value,
                                 provincia: ''
                             })}
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            placeholder="Selecciona tu comunidad"
-                        />
-                        <datalist id="comunidades">
-                            {COMUNIDADES_AUTONOMAS.map((ca) => (
-                                <option key={ca} value={ca} />
+                            className="w-full p-3 border border-gray-300 dark:border-gray-600 
+                                     bg-white dark:bg-gray-700 
+                                     text-gray-900 dark:text-gray-100
+                                     rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                                     dark:bg-gray-700 dark:text-gray-100
+                                     [&>*]:dark:bg-gray-700 [&>*]:dark:text-gray-100"
+                            style={{ colorScheme: 'light dark' }}
+                        >
+                            <option value="">Seleccione una comunidad...</option>
+                            {COMUNIDADES_AUTONOMAS.map((comunidad) => (
+                                <option key={comunidad} value={comunidad} className="bg-white dark:bg-gray-700">
+                                    {comunidad}
+                                </option>
                             ))}
-                        </datalist>
-                        {errors.comunidadAutonoma && <p className="text-red-500 text-sm mt-2">{errors.comunidadAutonoma}</p>}
+                        </select>
+                        {errors.comunidadAutonoma && (
+                            <p className="text-red-500 dark:text-red-400 text-sm mt-2">
+                                {errors.comunidadAutonoma}
+                            </p>
+                        )}
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Provincia</label>
+                        <label className="block text-sm font-medium text-gray-900 dark:text-black mb-2">Provincia</label>
                         <select
                             value={formData.provincia}
                             onChange={(e) => setFormData({ ...formData, provincia: e.target.value })}
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full p-3 border border-gray-300 dark:border-gray-600 
+                                     bg-white dark:bg-gray-700 
+                                     text-gray-900 dark:text-gray-100
+                                     rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             disabled={!formData.comunidadAutonoma}
                         >
                             <option value="">Seleccione una provincia...</option>
@@ -258,27 +291,36 @@ const DatosPersonales = () => {
                                 ))
                             }
                         </select>
-                        {errors.provincia && <p className="text-red-500 text-sm mt-2">{errors.provincia}</p>}
+                        {errors.provincia && <p className="text-red-500 dark:text-red-400 text-sm mt-2">{errors.provincia}</p>}
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Localidad</label>
+                        <label className="block text-sm font-medium text-gray-900 dark:text-black mb-2">Localidad</label>
                         <input
                             type="text"
                             maxLength={50}
                             value={formData.localidad}
                             onChange={(e) => setFormData({ ...formData, localidad: e.target.value })}
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full p-3 border border-gray-300 dark:border-gray-600 
+                                     bg-white dark:bg-gray-700 
+                                     text-gray-900 dark:text-white
+                                     rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             placeholder="Ingresa tu localidad"
                         />
-                        {errors.localidad && <p className="text-red-500 text-sm mt-2">{errors.localidad}</p>}
+                        {errors.localidad && <p className="text-red-500 dark:text-red-400 text-sm mt-2">{errors.localidad}</p>}
                     </div>
 
-                    <div className="bg-gray-50 p-6 rounded-lg">
-                        <label className="block text-sm font-medium text-gray-700 mb-4">Nivel Educativo</label>
+                    {/* Actualizar la sección de nivel educativo */}
+                    <div className="bg-gray-50 dark:bg-gray-700/50 p-6 rounded-lg">
+                        <label className="block text-sm font-medium text-gray-900 dark:text-black mb-4">
+                            Nivel Educativo
+                        </label>
                         <div className="grid md:grid-cols-2 gap-3">
                             {NIVELES_EDUCATIVOS.map((nivel) => (
-                                <div key={nivel} className="flex items-center space-x-3 p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200">
+                                <div key={nivel} 
+                                     className="flex items-center space-x-3 p-2 
+                                              hover:bg-gray-100 dark:hover:bg-gray-600 
+                                              rounded-lg transition-colors duration-200">
                                     <input
                                         type="radio"
                                         id={nivel}
@@ -289,27 +331,35 @@ const DatosPersonales = () => {
                                             ...formData, 
                                             nivelesEducativos: e.target.value 
                                         })}
-                                        className="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                                        className="w-4 h-4 text-blue-600 dark:text-blue-400 
+                                                 focus:ring-blue-500 dark:focus:ring-blue-400"
                                     />
-                                    <label htmlFor={nivel} className="text-sm text-gray-700">{nivel}</label>
+                                    <label htmlFor={nivel} className="text-sm text-gray-900 dark:text-black">
+                                        {nivel}
+                                    </label>
                                 </div>
                             ))}
                         </div>
-                        {errors.nivelesEducativos && <p className="text-red-500 text-sm mt-2">{errors.nivelesEducativos}</p>}
+                        {errors.nivelesEducativos && <p className="text-red-500 dark:text-red-400 text-sm mt-2">{errors.nivelesEducativos}</p>}
                     </div>
 
-                    {errors.submit && <p className="text-red-500 text-center">{errors.submit}</p>}
+                    {errors.submit && <p className="text-red-500 dark:text-red-400 text-center">{errors.submit}</p>}
 
-                    {/* Contenedor del botón */}
-                    <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/95 backdrop-blur-sm shadow-lg md:relative md:p-0 md:bg-transparent md:shadow-none">
+                    {/* Botón submit actualizado */}
+                    <div className="fixed bottom-0 left-0 right-0 p-4 
+                                  bg-white/95 dark:bg-gray-800/95 
+                                  backdrop-blur-sm shadow-lg 
+                                  md:relative md:p-0 md:bg-transparent md:shadow-none">
                         <div className="max-w-2xl mx-auto">
                             <button
                                 type="submit"
                                 className="w-full bg-gradient-to-r from-blue-600 to-purple-600 
+                                        dark:from-blue-500 dark:to-purple-500
                                         text-white py-4 px-6 rounded-lg font-medium 
                                         hover:shadow-lg transition-all
                                         focus:outline-none focus:ring-2 
-                                        focus:ring-blue-500 focus:ring-offset-2"
+                                        focus:ring-blue-500 focus:ring-offset-2
+                                        dark:focus:ring-blue-400 dark:focus:ring-offset-gray-800"
                             >
                                 Comenzar Test
                             </button>

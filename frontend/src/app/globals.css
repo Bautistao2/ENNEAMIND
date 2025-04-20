@@ -1,21 +1,40 @@
 @import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --gray-light: #666666;
+  --gray-dark: #d1d1d1;
+  --pink-light: #da0b72;
+  --pink-dark: #da1431;
+  --card-bg-light: #ffffff;
+  --card-bg-dark: #1a1a1a;
+  --header-bg-light: rgba(252, 231, 243, 0.8);
+  --header-bg-dark: rgba(88, 28, 135, 0.15);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-gray: var(--gray-light);
+  --color-pink: var(--pink-light);
   --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-mono: var(--font-mono);
+  --card-background: var(--card-bg-light);
+  --header-background: var(--header-bg-light);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --color-gray: var(--gray-dark);
+    --color-pink: var(--pink-dark);
+    --card-background: var(--card-bg-dark);
+    --header-background: var(--header-bg-dark);
   }
 }
 
@@ -23,4 +42,184 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Text visibility fixes */
+.text-gray-600 {
+  color: var(--color-gray);
+}
+
+.text-gray-700 {
+  color: var(--foreground);
+}
+
+/* Label colors fix */
+.text-gray-700 {
+  color: var(--foreground) !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  /* Aseguramos que los labels sean negros en modo oscuro */
+  .text-gray-700, 
+  .dark\:text-gray-200 {
+    color: #000000 !important;
+  }
+  
+  label.block.text-sm.font-medium {
+    color: #000000 !important;
+  }
+
+  /* Fix for educational level labels and header text */
+  label.text-sm,
+  p.text-center {
+    color: #000000 !important;
+  }
+  
+  /* Fix specifically for radio button labels */
+  .flex.items-center label {
+    color: #000000 !important;
+  }
+
+  /* Dark mode text visibility fixes */
+  .text-gray-700,
+  .text-gray-800 {
+    color: var(--foreground) !important;
+  }
+  
+  .text-gray-600 {
+    color: #9ca3af !important;
+  }
+
+  /* Radar chart title */
+  .bg-gray-50 h3 {
+    color: var(--foreground) !important;
+  }
+
+  /* Radar chart title in dark mode */
+  .bg-gray-50.dark\:bg-gray-800 h3 {
+    color: #000000 !important;
+  }
+}
+
+/* Button states */
+.bg-pink-500 {
+  background-color: var(--color-pink);
+}
+
+.bg-pink-600:hover {
+  opacity: 0.9;
+}
+
+/* Form elements */
+input[type="radio"] {
+  accent-color: var(--color-pink);
+}
+
+/* Form elements y text fixes */
+input,
+select,
+input[type="text"],
+input[type="number"] {
+  color: var(--foreground) !important;
+  background-color: var(--background) !important;
+}
+
+/* Agregar estos estilos específicos para select */
+select {
+  color: var(--foreground);
+  background-color: var(--background);
+}
+
+select option {
+  color: var(--foreground);
+  background-color: var(--background);
+}
+
+/* Fix para el texto seleccionado en modo oscuro */
+@media (prefers-color-scheme: dark) {
+  select, 
+  select option,
+  select:focus,
+  select:active {
+    color: var(--foreground) !important;
+    background-color: var(--background) !important;
+  }
+  
+  /* Fix para el valor seleccionado */
+  select:not(:focus):not(:active) {
+    color: var(--foreground) !important;
+  }
+}
+
+/* Specific dark mode fixes */
+@media (prefers-color-scheme: dark) {
+  input,
+  select,
+  input[type="text"],
+  input[type="number"],
+  select option {
+    background-color: var(--card-bg-dark) !important;
+    color: white !important;
+  }
+
+  .text-gray-700 {
+    color: white !important;
+  }
+
+  /* Fix for datalist options */
+  input[list]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+  }
+}
+
+/* Card and container visibility */
+.bg-white {
+  background: var(--card-background);
+}
+
+.border {
+  border-color: var(--color-gray);
+}
+
+/* Header and card styles */
+.bg-pink-100 {
+  background: var(--header-background);
+  backdrop-filter: blur(8px);
+}
+
+/* Make brain icon visible in dark mode */
+h1 {
+  filter: none; /* Remove any existing filters */
+}
+
+h1 span[role="img"] {
+  opacity: 1;
+  display: inline-block;
+}
+
+/* Improve card visibility in dark mode */
+.shadow-sm {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+@media (prefers-color-scheme: dark) {
+  .shadow-sm {
+    box-shadow: 0 1px 3px 0 rgba(255, 255, 255, 0.05);
+  }
+  
+  .border {
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* Progress bar improvements */
+.bg-gray-200 {
+  background-color: var(--color-gray);
+  opacity: 0.2;
+}
+
+.sticky.top-0 {
+  backdrop-filter: blur(8px);
+  background: var(--background);
+  opacity: 0.95;
 }
