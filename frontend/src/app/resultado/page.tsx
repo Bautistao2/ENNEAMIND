@@ -148,8 +148,22 @@ export default function ResultadoPage() {
               <ResponsiveContainer width="100%" height={400}>
                 <RadarChart cx="50%" cy="50%" outerRadius="80%" data={radarData} animationDuration={800}>
                   <PolarGrid strokeDasharray="3 3" />
-                  <PolarAngleAxis dataKey="eneatipo" fontSize={10} />
-                  <PolarRadiusAxis angle={90} domain={[0, maxValor]} tickCount={6} />
+                  <PolarAngleAxis dataKey="eneatipo" fontSize={12} />
+                  <PolarRadiusAxis 
+                    angle={90} 
+                    domain={[0, maxValor]} 
+                    tickCount={6}
+                    fontSize={10}  // Reducido de 8 a 6
+                    tick={{ 
+                      position: 'inside',
+                      offset: -5,  // Mover números más hacia dentro
+                      fill: '#666' // Color más suave
+                    }}
+                    axisLine={false}
+                    tickLine={false}
+                    scale="linear"  // Asegurar escala lineal
+                    orientation="left" // Orientación hacia la izquierda
+                  />
                   <Radar
                     name="Puntaje"
                     dataKey="puntaje"
@@ -159,7 +173,19 @@ export default function ResultadoPage() {
                   />
                   <Tooltip
                     formatter={(value: any, name: any) => [`Puntaje: ${value}`, name]}
-                    wrapperStyle={{ backgroundColor: '#fff', border: '1px solid #ccc' }}
+                    wrapperStyle={{ 
+                      backgroundColor: '#ffffff', // Fondo blanco fijo
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '8px',
+                      padding: '8px',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                    }}
+                    contentStyle={{
+                      color: '#000000', // Texto negro fijo
+                      fontSize: '14px',
+                      fontWeight: 500
+                    }}
+                    cursor={{ stroke: '#db2777' }}
                   />
                 </RadarChart>
               </ResponsiveContainer>
