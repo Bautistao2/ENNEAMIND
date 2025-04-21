@@ -19,16 +19,24 @@ const Radar = RadarType as any;
 const Tooltip = TooltipType as any;
 
 const descripciones: { [key: number]: string } = {
-  1: 'El Reformador: Ético, dedicado, y confiable. Tiene un fuerte sentido del bien y del mal.',
-  2: 'El Ayudador: Cariñoso, complaciente y generoso. Necesita ser amado.',
-  3: 'El Triunfador: Adaptable, sobresaliente, motivado. Necesita tener éxito.',
-  4: 'El Individualista: Sensible, introspectivo, emocionalmente honesto.',
-  5: 'El Investigador: Perceptivo, innovador, reservado. Busca comprender el mundo.',
-  6: 'El Leal: Comprometido, responsable, ansioso. Busca seguridad.',
-  7: 'El Entusiasta: Spontáneo, versátil, extrovertido. Evita el dolor.',
-  8: 'El Desafiador: Seguro de sí mismo, fuerte, protector. Le importa la justicia.',
-  9: 'El Pacificador: Agradable, complaciente, evita conflictos. Busca armonía.',
-}
+  1: '🧭 El Reformador: Es el justiciero interior que llevamos dentro. Tiene una brújula moral que nunca falla (aunque a veces se pase de estricta). Perfeccionista profesional, amante del orden y las reglas. Si algo está fuera de lugar, él lo ve. ¡Y sufre! Sueña con un mundo más justo… y con una casa impecable.',
+  
+  2: '💖 El Ayudador: El alma del grupo, el que llega con sopa cuando estás enfermo (aunque no la hayas pedido). Vive para dar, ayudar, cuidar, mimar… y recibir cariño a cambio. Le encanta sentirse necesitado. Su frase favorita: "¿Quieres que te ayude con eso?".',
+
+  3: '🏆 El Triunfador: El Cristiano Ronaldo del eneagrama. Siempre buscando ser el número uno, destacar, brillar. Ambicioso, elegante y con más metas que pestañas tiene un ciempiés. Todo lo convierte en logro… incluso dormir 8 horas puede ser un check de productividad.',
+
+  4: '🎨 El Individualista: Un alma artística con WiFi directo al corazón. Vive intensamente sus emociones (y las de los demás). Le gusta ser único, especial, diferente. A veces es drama queen, a veces poeta, siempre auténtico. Si tuviera un lema sería: "Siento, luego existo".',
+
+  5: '🧠 El Investigador: El sabio del grupo. Está en su cueva mental investigando, analizando y observando el universo. Le gusta entender TODO, pero con distancia emocional, por favor. Introvertido de manual, tiene la batería social de un Nokia, pero la memoria de una nube.',
+
+  6: '🛡️ El Leal: El guardián del castillo. Leal hasta la médula, protector de su gente. Siempre preparado para lo peor (aunque esté todo bien). Un poco paranoico, muy comprometido. Si pudiera tener un superpoder, sería el de anticipar todos los peligros... por si acaso.',
+
+  7: '🎉 El Entusiasta: Una fiesta andante. Energía infinita, ideas por mil, agenda llena. Odia aburrirse, ama vivir mil aventuras al mismo tiempo. Sabe 3 idiomas y 47 hobbies, aunque no termina ninguno. Es alegría pura… y un poquito disperso también.',
+
+  8: '🔥 El Desafiador: El líder nato. Intenso, fuerte, protector. No se anda con rodeos. Si ve injusticia, entra como toro en cacharrería. Tiene un corazón enorme, pero bien escondido detrás de su armadura de acero inoxidable. Respeto primero, cariño después.',
+
+  9: '🌿 El Pacificador: El zen del grupo. Tranquilo, relajado, adaptable. Le gusta que todos estén bien (incluyendo su perrito, su planta y su vecino ruidoso). Le cuesta decir "no" y ama una buena siesta. Si pudiera, resolvería todos los conflictos con un abrazo y un té.',
+};
 
 export default function ResultadoPage() {
   const [eneatipo, setEneatipo] = useState<number | null>(null)
@@ -101,7 +109,7 @@ export default function ResultadoPage() {
 
   return (
     <main className="max-w-3xl mx-auto p-6 space-y-6">
-      <h1 className="text-3xl font-bold text-center">🎯 Tu Perfil EnneaMind</h1>
+      <h1 className="text-3xl font-bold text-center">🎯 Basado en tus respuestas</h1>
 
       {error ? (
         <div className="bg-red-50 border border-red-200 p-4 rounded-xl text-center">
@@ -117,13 +125,17 @@ export default function ResultadoPage() {
         <div className="bg-white p-6 rounded-xl shadow space-y-6">
           <div className="text-center">
             <h2 className="text-xl font-semibold text-gray-700">Eneatipo dominante:</h2>
-            <p className="text-5xl font-bold text-pink-600">Eneatipo {eneatipo}</p>
+            <p className="text-3xl font-bold text-pink-600">Eneatipo {eneatipo}</p>
+            <div className="h-8"></div> {/* Div espaciador de 2rem (32px) */}
             <p className="text-gray-600 italic">{descripciones[eneatipo]}</p>
           </div>
-
+            <div className="h-7"></div> {/* Div espaciador de 2rem (32px) */}
           <div className="text-center">
-            <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-200">Ala:</h2>
-            <p className="text-3xl font-bold text-gray-800 dark:text-white">Ala {ala}</p>
+            <h2 className="text-base font-semibold text-gray-700 dark:text-gray-200">El ala es el número vecino a tu tipo principal en el eneagrama que le da un toque de sabor extra a tu personalidad. 🎨 Es como ser tú mismo, ¡pero con condimentos! 🌶️:</h2>
+          </div>  
+          <div className="h-8"></div> {/* Div espaciador de 2rem (32px) */}
+          <div className="text-center">
+            <p className="text-2xl font-bold text-gray-800 dark:text-white">Ala {ala}</p>
             <p className="text-gray-600 dark:text-gray-300 italic">{descripciones[ala]}</p>
           </div>
 

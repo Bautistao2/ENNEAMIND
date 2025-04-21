@@ -263,16 +263,12 @@ export default function Home() {
         <button
           disabled={pagina === 0}
           onClick={() => setPagina((prev) => prev - 1)}
-          className="bg-gray-200 dark:bg-gray-700 
-             text-gray-900 dark:text-white 
-             px-4 py-2 rounded 
-             hover:bg-gray-300 dark:hover:bg-gray-600 
-             disabled:opacity-50"
+          className="bg-pink-500 text-white px-4 py-2 rounded hover:bg-pink-600 disabled:opacity-50"
         >
           ← Anterior
         </button>
 
-        <span className="text-sm text-gray-600">
+        <span className="text-sm text-gray-600 dark:text-gray-300">
           Página {pagina + 1} de {totalPaginas}
         </span>
 

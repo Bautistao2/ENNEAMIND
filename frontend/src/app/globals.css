@@ -99,6 +99,22 @@ body {
   .bg-gray-50.dark\:bg-gray-800 h3 {
     color: #000000 !important;
   }
+
+  /* Button text color fixes */
+  button.bg-gray-200.dark\:bg-gray-700 {
+    color: white !important;
+  }
+
+  /* Fix para el botón Anterior y su flecha en modo oscuro */
+  button.bg-gray-200.dark\:bg-gray-700,
+  button.bg-gray-200.dark\:bg-gray-700 * {
+    color: white !important;
+  }
+
+  /* Asegurar que el botón disabled mantenga la opacidad correcta */
+  button.bg-gray-200.dark\:bg-gray-700[disabled] {
+    opacity: 0.5;
+  }
 }
 
 /* Button states */
