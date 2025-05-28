@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabaseClient'
+import { supabase } from '../../lib/supabaseClient'
 import {
   RadarChart,
   PolarGrid,
@@ -12,6 +12,14 @@ import {
   ResponsiveContainer,
   Radar as RadarType,
 } from 'recharts'
+
+// Definir el tipo para la estructura columnar
+type UserColumnarResponsesData = {
+  user_id: number;
+  [key: string]: any; // Para las columnas de preguntas dinámicas
+  eneatipo_resultado: number | null;
+  ala_resultado: number | null;
+}
 
 const PolarAngleAxis = PolarAngleAxisType as any;
 const PolarRadiusAxis = PolarRadiusAxisType as any;
@@ -65,32 +73,62 @@ export default function ResultadoPage() {
         if (userId.includes(':')) {
           userId = userId.split(':')[0]
         }
-
         console.log('🔍 Buscando resultados para userId:', userId)
 
-        const { data, error } = await supabase
-          .from('results_test')
-          .select('eneatipo_resultado, ala_resultado, puntajes')
+        // Obtener datos de la tabla columnar
+        const { data: columnarData, error: columnarError } = await supabase
+          .from('user_columnar_responses')
+          .select('*')  // Seleccionamos todos los campos
           .eq('user_id', userId)
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .single()
+          .single();
+        
+        if (columnarData && !columnarError) {
+          console.log('✅ Datos encontrados en user_columnar_responses');
+          setEneatipo(columnarData.eneatipo_resultado);
+          setAla(columnarData.ala_resultado);
+          
+          // Calcular puntajes a partir de las respuestas
+          if (!columnarData.eneatipo_resultado) {
+            console.log('⚠️ Eneatipo no calculado aún');
+          } else {
+            // Necesitamos consultar las preguntas para obtener los eneatipos asociados a cada una
+            const { data: preguntas, error: preguntasError } = await supabase
+              .from('questions_test')
+              .select('id, eneatipo_asociado');
+            
+            if (preguntasError) {
+              console.error('❌ Error al cargar preguntas:', preguntasError);
+              return;
+            }
+            
+            // Convertir respuestas a formato de puntajes para el gráfico radar
+            const puntajesPorEneatipo: { [key: string]: number } = {};
 
-        if (error) {
-          console.error('❌ Error completo:', JSON.stringify(error, null, 2))
-          setError(`Error al cargar datos: ${error.message}`)
-          return
+            // Iterar sobre cada columna de pregunta en el resultado
+            Object.entries(columnarData).forEach(([campo, valor]) => {
+              // Comprobar si el campo es una columna de pregunta
+              if (campo.startsWith('pregunta_') && valor !== null && typeof valor === 'number') {
+                const preguntaId = parseInt(campo.replace('pregunta_', ''));
+                
+                // Encontrar la pregunta correspondiente
+                const pregunta = preguntas.find(p => p.id === preguntaId);
+                if (pregunta) {
+                  const eneatipoAsociado = pregunta.eneatipo_asociado.toString();
+                  // Sumar el valor al puntaje del eneatipo correspondiente
+                  puntajesPorEneatipo[eneatipoAsociado] = (puntajesPorEneatipo[eneatipoAsociado] || 0) + valor;
+                }
+              }
+            });
+            
+            setPuntajes(puntajesPorEneatipo);
+          }
+          return;
         }
+        
+        // Si no hay datos en ninguna tabla
+        console.log('⚠️ No se encontraron datos en user_columnar_responses');
+        setError('No se encontraron resultados para este usuario')
 
-        if (!data) {
-          setError('No se encontraron resultados para este usuario')
-          return
-        }
-
-        setEneatipo(data.eneatipo_resultado)
-        setAla(data.ala_resultado)
-        setPuntajes(data.puntajes || {})
-        setError(null)
       } catch (err) {
         console.error('❌ Error inesperado:', err)
         setError('Ocurrió un error inesperado')

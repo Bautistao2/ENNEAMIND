@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabaseClient';
+import { supabase } from '../../lib/supabaseClient';
 
 // Comunidades autónomas de España
 const COMUNIDADES_AUTONOMAS = [
@@ -120,9 +120,7 @@ const DatosPersonales = () => {
             }
 
             const userId = insertedData[0].user_id;
-            console.log('Nuevo user_id generado:', userId);
-
-            // 2. Insertar en results_test
+            console.log('Nuevo user_id generado:', userId);            // 2. Insertar en results_test (para compatibilidad)
             const { data: resultData, error: resultsError } = await supabase
                 .from('results_test')
                 .insert({
@@ -138,6 +136,27 @@ const DatosPersonales = () => {
             if (resultsError) {
                 console.error('Error en results_test:', resultsError);
                 throw resultsError;
+            }
+              // 3. Insertar en nueva tabla columnar
+            const { data: columnarData, error: columnarError } = await supabase
+                .from('user_columnar_responses')
+                .insert({
+                    user_id: userId,
+                    eneatipo_resultado: null,
+                    ala_resultado: null,
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                })
+                .select();
+
+            if (columnarError) {
+                console.error('Error al insertar en user_columnar_responses:', columnarError);
+                console.error('SQL error code:', columnarError.code);
+                console.error('SQL error hint:', columnarError.hint);
+                console.error('SQL error details:', columnarError.details);
+                // No lanzamos error para no interrumpir el flujo si falla solo la inserción en la tabla nueva
+            } else {
+                console.log('Datos insertados en user_columnar_responses:', columnarData);
             }
 
             console.log('Datos insertados en results_test:', resultData);

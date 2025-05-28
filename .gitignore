@@ -15,3 +15,7 @@ __pycache__/
 # Sistemas
 .DS_Store
 Thumbs.db
+
+
+supabase/
+frontend_backup/

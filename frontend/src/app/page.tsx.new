@@ -1,0 +1,180 @@
+'use client'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { supabase } from '../lib/supabaseClient'
+
+type Pregunta = {
+  id: number
+  texto: string
+  eneatipo_asociado: number
+  orden: number
+}
+
+type UserColumnarResponsesData = {
+  user_id: number;
+  [key: string]: number | null | Date | undefined;
+  eneatipo_resultado?: number;
+  ala_resultado?: number;
+}
+
+type PuntajesType = { [key: number]: number }
+type ResultadoCalculado = {
+  eneatipo: number;
+  ala: number;
+  confianza: number;
+}
+
+const opcionesTexto = ['Casi nunca', 'Rara vez cierto', 'Algo cierto', 'Generalmente cierto', 'Muy cierto']
+
+export default function Home() {
+  const [preguntas, setPreguntas] = useState<Pregunta[]>([])
+  const [respuestas, setRespuestas] = useState<{ [id: number]: number }>({})
+  const [pagina, setPagina] = useState(0)
+  const [userId, setUserId] = useState<string>('')
+  const [startTime] = useState(Date.now())
+  const router = useRouter()
+
+  // ... existing code for useEffect and handleChange ...
+
+  const handleEnviar = async () => {
+    try {
+      console.log('Iniciando envío de respuestas...');
+      
+      if (!userId) {
+        alert('Error: No se encontró el ID de usuario')
+        router.push('/datos-personales')
+        return
+      }
+
+      console.log('ID de usuario encontrado:', userId);
+      
+      const todasRespondidas = preguntas.every(p => respuestas[p.id])
+      if (!todasRespondidas) {
+        alert('Debes responder todas las preguntas antes de enviar el test.')
+        return
+      }
+
+      console.log('Todas las preguntas respondidas. Total de respuestas:', Object.keys(respuestas).length);
+
+      const userIdNum = parseInt(userId)
+      
+      // Preparar los datos en formato columnar
+      const columnarData: { [key: string]: number } = {};
+      Object.entries(respuestas).forEach(([preguntaId, valor]) => {
+        // Asegurarse que los valores sean números enteros
+        columnarData[`pregunta_${preguntaId}`] = parseInt(valor.toString());
+      });
+
+      // Verificar si ya existe un registro
+      const { data: existingData, error: checkError } = await supabase
+        .from('user_columnar_responses')
+        .select('user_id')
+        .eq('user_id', userIdNum)
+        .single();
+
+      let saveError;
+      const timestamp = new Date().toISOString();
+
+      if (!existingData) {
+        // Insertar nuevo registro
+        const insertData = {
+          user_id: userIdNum,
+          ...columnarData,
+          created_at: timestamp,
+          updated_at: timestamp
+        };
+
+        const { error } = await supabase
+          .from('user_columnar_responses')
+          .insert([insertData])
+          .select();
+
+        saveError = error;
+      } else {
+        // Actualizar registro existente
+        const updateData = {
+          ...columnarData,
+          updated_at: timestamp
+        };
+
+        const { error } = await supabase
+          .from('user_columnar_responses')
+          .update(updateData)
+          .eq('user_id', userIdNum)
+          .select();
+
+        saveError = error;
+      }
+
+      if (saveError) {
+        console.error('Error al guardar respuestas:', saveError);
+        throw saveError;
+      }
+
+      // Calcular resultados
+      const puntajes: PuntajesType = {}
+      preguntas.forEach((p) => {
+        const valor = respuestas[p.id]
+        if (valor) {
+          puntajes[p.eneatipo_asociado] = (puntajes[p.eneatipo_asociado] || 0) + valor
+        }
+      })
+
+      const resultado = calcularResultado(puntajes)
+
+      // Actualizar resultados
+      const { error: updateError } = await supabase
+        .from('user_columnar_responses')
+        .update({
+          eneatipo_resultado: resultado.eneatipo,
+          ala_resultado: resultado.ala,
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', userIdNum)
+        .select();
+
+      if (updateError) {
+        console.error('Error al actualizar resultados:', updateError);
+        throw updateError;
+      }
+
+      // Actualizar results_test para compatibilidad
+      const { error: resultsError } = await supabase
+        .from('results_test')
+        .update({
+          eneatipo_resultado: resultado.eneatipo,
+          ala_resultado: resultado.ala,
+          confianza: resultado.confianza,
+          puntajes: puntajes,
+          duracion_test: Math.floor((Date.now() - startTime) / 1000)
+        })
+        .eq('user_id', userIdNum)
+        .single();
+
+      if (resultsError) {
+        console.error('Error al actualizar results_test:', resultsError);
+        // No lanzar error aquí ya que no es crítico
+      }
+
+      localStorage.removeItem('respuestas')
+      localStorage.removeItem('pagina')
+      router.push('/resultado')
+
+    } catch (error) {
+      console.error('Error detallado:', error);
+      
+      const supabaseError = error as any;
+      if (supabaseError?.code || supabaseError?.details || supabaseError?.hint) {
+        console.error('Error de Supabase:');
+        console.error('- Código:', supabaseError.code);
+        console.error('- Detalles:', supabaseError.details);
+        console.error('- Sugerencia:', supabaseError.hint);
+        console.error('- Mensaje:', supabaseError.message);
+      }
+      
+      alert('Hubo un error al guardar tus respuestas. Por favor, intenta de nuevo.');
+    }
+  }
+
+  // ... rest of existing code ...
+}
