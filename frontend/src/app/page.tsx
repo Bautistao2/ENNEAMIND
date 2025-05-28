@@ -17,9 +17,12 @@ type ResultadoCalculado = {
   confianza: number;
 }
 
-// Definir tipos específicos para las respuestas
-type RespuestaColumnar = {
-  [key: `pregunta_${number}`]: number | null;
+// Definir tipo para errores de Supabase
+type SupabaseError = {
+  code?: string;
+  details?: string;
+  hint?: string;
+  message: string;
 }
 
 const opcionesTexto = ['Casi nunca', 'Rara vez cierto', 'Algo cierto', 'Generalmente cierto', 'Muy cierto']
@@ -291,7 +294,7 @@ export default function Home() {
       }
       
       // Verificar si el error es de Supabase
-      const supabaseError = error as any;
+      const supabaseError = error as SupabaseError;
       if (supabaseError?.code || supabaseError?.details || supabaseError?.hint) {
         console.error('Error de Supabase:');
         console.error('- Código:', supabaseError.code);
