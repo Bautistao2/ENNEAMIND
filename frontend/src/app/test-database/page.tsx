@@ -4,11 +4,11 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabaseClient'
 
 export default function TestDatabasePage() {
-  const [testResults, setTestResults] = useState([])
-  const [error, setError] = useState(null)
-  const [loading, setLoading] = useState(false)
-  const [userId, setUserId] = useState('')
-  const [manualUserId, setManualUserId] = useState('')
+  const [testResults, setTestResults] = useState<string[]>([])
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState<boolean>(false)
+  const [userId, setUserId] = useState<string>('')
+  const [manualUserId, setManualUserId] = useState<string>('')
 
   useEffect(() => {
     // Try to get user_id from localStorage
@@ -121,17 +121,15 @@ export default function TestDatabasePage() {
         addResult('⚠️ No se proporcionó un ID de usuario para pruebas de inserción')
       }
 
-      addResult('🏁 Pruebas completadas')
-
-    } catch (error) {
-      setError(`Error en las pruebas: ${error.message}`)
-      addResult(`❌ Error general: ${error.message}`)
+      addResult('🏁 Pruebas completadas')    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+      setError(`Error en las pruebas: ${errorMessage}`);
+      addResult(`❌ Error general: ${errorMessage}`);
     } finally {
       setLoading(false)
     }
   }
-
-  const addResult = (message) => {
+  const addResult = (message: string) => {
     setTestResults(prev => [...prev, message])
   }
 
