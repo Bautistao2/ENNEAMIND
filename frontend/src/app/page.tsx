@@ -10,20 +10,16 @@ type Pregunta = {
   orden: number
 }
 
-// Tipo para la estructura columnar
-type UserColumnarResponsesData = {
-  user_id: number;
-  // Campos individuales para cada pregunta serán generados dinámicamente 
-  [key: string]: number | null | Date | undefined;
-  eneatipo_resultado?: number;
-  ala_resultado?: number;
-}
-
 type PuntajesType = { [key: number]: number }
 type ResultadoCalculado = {
   eneatipo: number;
   ala: number;
   confianza: number;
+}
+
+// Definir tipos específicos para las respuestas
+type RespuestaColumnar = {
+  [key: `pregunta_${number}`]: number | null;
 }
 
 const opcionesTexto = ['Casi nunca', 'Rara vez cierto', 'Algo cierto', 'Generalmente cierto', 'Muy cierto']
@@ -171,6 +167,10 @@ export default function Home() {
         .select('user_id')
         .eq('user_id', userIdNum)
         .single()
+
+      if (checkColumnarError && checkColumnarError.code !== 'PGR4011') {
+        throw checkColumnarError
+      }
 
       // Insertar o actualizar en la tabla columnar
       let columnarResponseError;

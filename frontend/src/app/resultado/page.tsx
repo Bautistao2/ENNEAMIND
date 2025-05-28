@@ -13,14 +13,6 @@ import {
   Radar as RadarType,
 } from 'recharts'
 
-// Definir el tipo para la estructura columnar
-type UserColumnarResponsesData = {
-  user_id: number;
-  [key: string]: any; // Para las columnas de preguntas dinámicas
-  eneatipo_resultado: number | null;
-  ala_resultado: number | null;
-}
-
 const PolarAngleAxis = PolarAngleAxisType as any;
 const PolarRadiusAxis = PolarRadiusAxisType as any;
 const Radar = RadarType as any;

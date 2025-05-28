@@ -28,7 +28,7 @@ export default function TestDatabasePage() {
 
       // Test 1: Verificar conexión a Supabase
       addResult('🔌 Probando conexión a Supabase...')
-      const { data: connectionTest, error: connectionError } = await supabase
+      const { error: connectionError } = await supabase
         .from('personal_data')
         .select('count(*)', { count: 'exact' })
         .limit(1)
